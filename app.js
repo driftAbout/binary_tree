@@ -17,7 +17,7 @@ BinaryTree.prototype.insertValue = function(val) {
     //if the value exist leave the function
     if (val === binaryObject.value){
       traverse = false;
-      return;
+      return false;
     }
     //set the branch to right, change it to left if is less than the value
     branch = 'right';
@@ -28,7 +28,7 @@ BinaryTree.prototype.insertValue = function(val) {
     if (! binaryObject[branch]){
       binaryObject[branch] = new BinaryTree(val);
       traverse = false;
-      return;
+      return true;
     }
     //if the branch exists set it as the next branch to search
     binaryObject = binaryObject[branch];
@@ -67,6 +67,29 @@ BinaryTree.prototype.includesValue = function(val) {
 };
 
 
+function randomTree(min, max) {
+  var midPoint = Math.ceil((max - min)/2);
+  //var random_tree = new BinaryTree(midPoint);
+  var insertCount = 0;
+  var inclusive = (max - min) + 1;
+  var tree_value;
+  var tree_values = [];
+  while (insertCount < inclusive) {
+    tree_value = Math.floor((Math.random() * inclusive) + min);
+    if (!tree_values.includes(tree_value)){
+      tree_values.push(tree_value);
+      console.log(insertCount, tree_value, 'tree_values.length: ', tree_values.length);
+      insertCount++;
+    }
+  }
+  console.log('tree_values: ', tree_values);
+
+}
+
+
+randomTree(7, 21);
+
+/*
 var num = 157;
 var binary_tree = new BinaryTree(num);
 
@@ -79,3 +102,4 @@ var valueExists = binary_tree.includesValue(11);
 
 console.log(binary_tree);
 console.log('valueExists: ', valueExists);
+*/
