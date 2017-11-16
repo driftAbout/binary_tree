@@ -4,6 +4,7 @@ function BinaryTree(val){
   this.value = val;
   this.left;
   this.right;
+  this.length = 1;
 }
 
 BinaryTree.prototype.insertValue = function(val) {
@@ -13,7 +14,7 @@ BinaryTree.prototype.insertValue = function(val) {
   var x = 1;
 
   while (traverse){
-    console.log('inset count ', x, ': ', val);
+    console.log('insert count ', x, ': ', val);
     //if the value exist leave the function
     if (val === binaryObject.value){
       traverse = false;
@@ -27,6 +28,7 @@ BinaryTree.prototype.insertValue = function(val) {
     //if the branch does not exist, create it with that value
     if (! binaryObject[branch]){
       binaryObject[branch] = new BinaryTree(val);
+      this.length++;
       traverse = false;
       return true;
     }
@@ -68,21 +70,24 @@ BinaryTree.prototype.includesValue = function(val) {
 
 
 function randomTree(min, max) {
-  var midPoint = Math.ceil((max - min)/2);
-  //var random_tree = new BinaryTree(midPoint);
-  var insertCount = 0;
+  var midPoint = Math.ceil((max - min)/2) + min;
+  var random_tree = new BinaryTree(midPoint);
+  //insertCount starts at 1 because a value was added for the midpoint
+  var insertCount = 1;
   var inclusive = (max - min) + 1;
+  console.log('inclusive: ', inclusive);
   var tree_value;
   var tree_values = [];
   while (insertCount < inclusive) {
     tree_value = Math.floor((Math.random() * inclusive) + min);
-    if (!tree_values.includes(tree_value)){
-      tree_values.push(tree_value);
-      console.log(insertCount, tree_value, 'tree_values.length: ', tree_values.length);
+    var unique = random_tree.insertValue(tree_value);
+    if (unique){
+      console.log(insertCount, tree_value, 'Added: ', unique);
       insertCount++;
     }
   }
-  console.log('tree_values: ', tree_values);
+  console.log('random_tree_length: ', random_tree.length);
+  console.log('random_tree: ', random_tree);
 
 }
 
