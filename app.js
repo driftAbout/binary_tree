@@ -4,7 +4,7 @@ function BinaryTree(val){
   this.value = val;
   this.left;
   this.right;
-  this.length = 1;
+  //this.length = 1;
 }
 
 BinaryTree.prototype.insertValue = function(val) {
@@ -27,8 +27,8 @@ BinaryTree.prototype.insertValue = function(val) {
     //if the branch does not exist, create it with that value
     if (! binaryObject[branch]){
       binaryObject[branch] = new BinaryTree(val);
-      this.length++;
-      console.log('insert count ', x, ': ', val);
+      //this.length++;
+    //  console.log('insert count ', x, ': ', val);
       traverse = false;
       return true;
     }
@@ -71,31 +71,86 @@ BinaryTree.prototype.includesValue = function(val) {
 
 BinaryTree.prototype.removeValue = function(val) {
   var binaryObject = this;
-  var branch = right;
-  var otherBranch = right;
+  var parentBranch;
+  var branch = 'right';
+  var otherBranch = 'right';
   var traverse = true;
 
   while (traverse){
+    // //change the branch to left if is less than the value
+    // branch = 'right';
+    // if (val < binaryObject.value){
+    //   branch = 'left';
+    // }
+
+    // branch = 'right';
+    // if (val < parentBranch.value){
+    //   branch = 'left';
+    // }
+
+
     //if the value exists then you found the branch to modify
     if (val === binaryObject.value){
-      if (branch === right) otherBranch = left;
+      console.log('found: ', val);
+      if (branch === 'right') otherBranch = 'left';
+      //if the branch does not have any sub-branches then just remove the branch
+      if (! binaryObject[branch] && ! binaryObject[otherBranch]){
+        console.log('No children');
+        delete parentBranch[branch];
+        traverse = false;
+        return;
+      }
+      //if the branch only has one sub-branch, just move the sub-branch up
+      if (! binaryObject[branch] || ! binaryObject[otherBranch]) {
+        if (! binaryObject[branch]) branch = otherBranch;
+        console.log('Only ', branch, ' branch');
+        binaryObject.value = binaryObject[branch].value;
+        binaryObject[branch] = binaryObject[branch][branch];
+        traverse = false;
+        return;
+      }
+
       //set the value of the current branch to the value of the sub-branch on the same side
       binaryObject.value = binaryObject[branch].value;
+      //console.log('binaryObject.value: ', binaryObject.value );
       //capture the value of the other subBranch
       var otherBranchObject = binaryObject[otherBranch];
+      //delete the other branch, it will get appended tot he other side at the end
+
+      delete binaryObject[otherBranch];
       //reset the values of the current branches sub-branches as the sub-brances of the sub-branch from the same side
+      //move each sub-branch to the parent branch
+      var subBranch = binaryObject[branch][otherBranch];
+      console.log('subBranch: ', subBranch);
       binaryObject[branch] = binaryObject[branch][branch];
-      binaryObject[otherBranch] = binaryObject[branch][otherBranch];
+
+      //move the oposite sub-branch if it exists
+      if(subBranch){
+        console.log('added sub-branch');
+        binaryObject[otherBranch] = subBranch;
+      }
+      //if there isn't another branch then there is nothing to move
+      if (! otherBranchObject) {
+        traverse = false;
+        return;
+      }
 
       //find the end of the sub-branch of the sub-branch from the same side
       var treeContinues = true;
+      //var binaryObjectTarget = binaryObject[otherBranch];
       var binaryObjectTarget = binaryObject[otherBranch];
+      //if found end of the line, append sub-branch
+      if (! binaryObjectTarget){
+        binaryObject[otherBranch] = otherBranchObject;
+        traverse = false;
+        return;
+      }
       while(treeContinues){
         //if the sub-branch does not exist you found the end
         if(! binaryObjectTarget[otherBranch]){
           //insert the sub-branch from the opposite side of the original removed branch
           binaryObjectTarget[otherBranch] = otherBranchObject;
-          console.log('found');
+          //console.log('found');
           treeContinues = false;
           return;
         };
@@ -105,18 +160,24 @@ BinaryTree.prototype.removeValue = function(val) {
       //traverse = false;
       //return true;
     }
+
+    //if the branch does not exist, then this value does not exist in the tree
+
     //change the branch to left if is less than the value
+    branch = 'right';
     if (val < binaryObject.value){
       branch = 'left';
     }
-    //if the branch does not exist, then this value does not exist in the tree
+
     if (! binaryObject[branch]){
+      console.log('Value does not exist');
       traverse = false;
       return false;
     }
-    //if the branch exists set it as the next branch to search
+
+    //if the value was not found, set the next branch to search in the loop
+    parentBranch = binaryObject;
     binaryObject = binaryObject[branch];
-    x++;
   }
 };
 
@@ -127,18 +188,18 @@ function randomTree(min, max) {
   //insertCount starts at 1 because a value was added for the midpoint
   var insertCount = 1;
   var inclusive = (max - min) + 1;
-  console.log('inclusive: ', inclusive);
+  //console.log('inclusive: ', inclusive);
   var tree_value;
   while (insertCount < inclusive) {
     tree_value = Math.floor((Math.random() * inclusive) + min);
     var unique = random_tree.insertValue(tree_value);
     if (unique){
-      console.log(insertCount, tree_value, 'Added: ', unique);
+    //  console.log(insertCount, tree_value, 'Added: ', unique);
       insertCount++;
     }
   }
-  console.log('random_tree_length: ', random_tree.length);
-  console.log('random_tree: ', random_tree);
+  //console.log('random_tree_length: ', random_tree.length);
+  //console.log('random_tree: ', random_tree);
 
   return random_tree;
 
@@ -157,12 +218,16 @@ function sortedTree(min, max) {
   return sorted_tree;
 }
 
-var binary_tree = sortedTree(1, 10);
-//var binary_tree = randomTree(7, 36);
+//var binary_tree = sortedTree(1, 10);
+var binary_tree = randomTree(1, 100);
+
+console.log(JSON.stringify(binary_tree));
+console.log(binary_tree);
 var valueExists = binary_tree.includesValue(11);
 
-//binary_tree.removeValue(7)
+binary_tree.removeValue(28);
 
+console.log(JSON.stringify(binary_tree));
 console.log(binary_tree);
 console.log('valueExists: ', valueExists);
 
